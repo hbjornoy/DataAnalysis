@@ -1,3 +1,9 @@
-# DataAnalysis
+# ADA - Applied Data Analysis
 
-CS-401 Applied data analysis (ADA), fall 2017
+
+EPFL: CS-401 Applied data analysis (ADA), fall 2017
+
+#### Authors
+- Santiago St Supéry
+- Julien Belguise
+- Håvard Bjørnøy
