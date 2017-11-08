@@ -39,7 +39,7 @@ Our main dataset is coming from the one called “Million song” that was provi
 - Comment and debug our code
 - Set up our goals and plans for the next milestone.
 
-####Options to consider:
+#### Options to consider:
 
 - Extend our work to others languages than English
 
