@@ -17,6 +17,8 @@ We examine various features, they are the following:
 - Polarity of the lyrics
 - Evolution of complexity through time inside a genre
 
+In order to have a more efficient classification, we still have to get rid of the non-english data. The structure to analyse it is in our possession, but extra data wrangling is necessary.
+
 ### 3. Visualization: How to meaningfully represent the data
 We provide a data strcture that enables straightforward visualization. We present what we think is the most fitting way to visualize our data. 
 
