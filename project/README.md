@@ -1,5 +1,5 @@
 # Social topics throughout music: sentiment analysis
-## Final Handout
+## Final Handout: Milestone 3
 Our data story can be found on the following page:
 
 https://polarityandlexicalcomplexityforsocialtopics.wordpress.com/
