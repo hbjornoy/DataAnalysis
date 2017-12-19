@@ -4,7 +4,7 @@ Our data story can be found on the following page:
 
 https://polarityandlexicalcomplexityforsocialtopics.wordpress.com/
 
-#### Abstract
+## Abstract
 In this project, our goal is to find out about the social topics evolution in culture. We will use music lyrics from the “Million song dataset” to analyse sentiment in tracks from artist, genres and time. What can the sentiment towards different topics in songs tell us about people and the time they live in? Our goal is to provide a visualization of semantic trends in music, that hopefully will give people more insight into everyday social topics and how they evolve as a part of our culture.
 To visualize our data, we want high interactivity so one can have filter by one’s own interest in this high dimensional space. Therefore, our work will be presented in the form of an interactive blog. 
 
