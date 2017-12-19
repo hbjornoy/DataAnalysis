@@ -9,6 +9,8 @@ import matplotlib.path as path
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sklearn.preprocessing
+import pickle
+import pandas as pd
 
 
 def create_gensim_wv_from_glove(path_to_glove_folder):
@@ -74,7 +76,7 @@ def calculate_topic_similarity(word_vector, topic_vector, global_vectors, std_di
         try:
             word_vector = global_vectors.wv[word_vector]
         except KeyError:
-            return -999
+            return np.nan
 
     if np.any(std_dims != False):
         if len(std_dims) != global_vectors.wv.syn0.shape[1]:
@@ -127,6 +129,9 @@ def analyze_related_words(related_words, global_vectors):
 
 
 def polarplot_wordvector(wordvectors, yticks=None, ylim=None):
+    """
+    This plotting function is only used as a analysistool while working out how to define similarity to topic. It is not a integral part of our code. But it shows how we work with vizualizing to understand the problemspace.
+    """
     # Example property
     properties = range(wordvectors[0].shape[0])
     # Choose some nice colors
@@ -171,3 +176,81 @@ def polarplot_wordvector(wordvectors, yticks=None, ylim=None):
 
     plt.show()
 
+
+def vocabulary_calculate_topics(words_defining_topics, name_of_topics, global_vectors, keep_const=0.45,full_word_list_path="full_word_list.pkl"):
+    """
+    calculate each words similarity to a topic
+    """
+    # loop through the topics, create the topic, and group same topics in the same tuple
+    topic_vectors = []
+    for topic in words_defining_topics:
+        topic_vectors.append(create_topic(topic, global_vectors))
+    
+    full_word_list = pickle.load( open( full_word_list_path, "rb" ) )
+    vocab_topics = full_word_list.copy(deep=True)
+    perc_dim_to_compare = 0.4
+
+    for topics, topic_name in zip(topic_vectors, name_of_topics):
+
+        print(topic_name)
+
+        topic_scores = []
+        for word in vocab_topics.Word:
+            topic_scores.append(calculate_topic_similarity(word, topics[0],
+                                global_vectors, std_dims=topics[1], perc_dim_to_compare=perc_dim_to_compare))
+
+        # giving a suitable cloumnname
+        columnname = "topic_" + topic_name
+        topic_column = pd.Series(topic_scores, index=full_word_list.index)
+        topic_column = topic_column.apply(lambda x: 1 if x>0.45 else 0)
+        vocab_topics[columnname] = topic_column
+        
+    vocab_topics = vocab_topics.dropna()
+    
+    return vocab_topics
+    
+def score_song(words_freq, vocab_topics, column):
+    """
+    Calculates the score per song given the unique words in the song and their frequency, 
+    it must also know the vocabulary of the topic
+    """
+    occurence_words_not_in_vocab = 0
+    total_words_in_song = 0
+    nr_words_per_song = 0
+    column_score = 0
+    words_freq = list(words_freq)
+    for word_info in words_freq:
+        [word_index, freq] = word_info.split(':')
+        total_words_in_song += int(freq)
+        try:
+            word_score = vocab_topics.get_value(int(word_index),column)
+            column_score += word_score*int(freq)
+            nr_words_per_song += int(freq)
+        except KeyError:
+            occurence_words_not_in_vocab += int(freq)
+    if nr_words_per_song is not 0:
+        column_score = column_score/nr_words_per_song
+    else:
+        column_score = 'NaN'
+    return column_score, occurence_words_not_in_vocab, total_words_in_song
+
+
+def score_songs(matches, vocab_topics, column_startwith='topic'):
+    """
+    Calculates the score for every song and add infomation about the topics to the song dataframe
+    """
+    
+    #Fetch the columnnames of the topics
+    column_names = [col for col in vocab_topics.columns if col.startswith(column_startwith)]
+
+    #Applying the polarity analysis for the bags of words
+    for column in column_names:
+        occ_sum = 0
+        tot_sum = 0
+        for i in matches.index: 
+            if np.all(score_song(matches.at[i, 'words_freq'], vocab_topics, column) != None):
+                matches.at[i, column], occ, tot = score_song(matches.at[i, 'words_freq'], vocab_topics, column)
+                occ_sum += occ
+                tot_sum += tot
+    
+    return matches, occ_sum, tot_sum 
